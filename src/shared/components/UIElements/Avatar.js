@@ -8,6 +8,8 @@ const Avatar = props => {
       <img
         src={props.image}
         alt={props.alt}
+        // The style prop is set-up to support being used in the future, 
+        // but is not mandatory to use now. Since there is already default styling built-in
         style={{ width: props.width, height: props.width }}
       />
     </div>
