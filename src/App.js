@@ -5,6 +5,7 @@ import Users from './user/pages/Users';
 import NewPlace from './places/pages/NewPlace';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 import UserPlaces from './places/pages/UserPlaces';
+import UpdatePlace from './places/pages/UpdatePlace';
 
 const App = () => {
   return (
@@ -23,6 +24,10 @@ const App = () => {
             {/* That's why if you type this exact url, you end up re-directing */}
             {/* That's why we need the Switch component */}
             <NewPlace />
+          </Route>
+          {/* This one needs to come after. */}
+          <Route path="/places/:placeId">
+            <UpdatePlace />
           </Route>
           {/* If the there is no matching path then re-direct back to / */}
           <Redirect to="/" />
