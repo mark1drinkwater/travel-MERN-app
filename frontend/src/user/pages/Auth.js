@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 import Input from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
 import { VALIDATOR_REQUIRE, VALIDATOR_EMAIL, VALIDATOR_MINLENGTH } from '../../shared/util/Validators';
 import { useForm } from '../../shared/hooks/form-hook';
 import Card from "../../shared/components/UIElements/Card";
+import { AuthContext } from "../../shared/context/auth-context";
 
 const Auth = () => {
+    const auth = useContext(AuthContext);
+
     const [isLoginMode, setIsLoginMode] = useState(true);
 
     const [formState, inputHandler, setFormData] = useForm(
@@ -31,6 +34,7 @@ const Auth = () => {
             // We're going from signup to login
             // So want to drop name & retain username, password
             setFormData({
+                ...formState.inputs,
                 name: undefined
             }, formState.inputs.email.isValid && 
                 formState.inputs.password.isValid)
@@ -54,6 +58,7 @@ const Auth = () => {
     const authSubmitHandler = event => {
         event.preventDefault();
         console.log(formState.inputs)
+        auth.login();
     }
 
     return (<Card>
