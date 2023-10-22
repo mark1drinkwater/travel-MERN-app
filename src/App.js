@@ -6,6 +6,7 @@ import NewPlace from './places/pages/NewPlace';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
 import UserPlaces from './places/pages/UserPlaces';
 import UpdatePlace from './places/pages/UpdatePlace';
+import Auth from './user/pages/Auth';
 
 const App = () => {
   return (
@@ -28,6 +29,9 @@ const App = () => {
           {/* This one needs to come after. */}
           <Route path="/places/:placeId">
             <UpdatePlace />
+          </Route>
+          <Route path="/auth">
+            <Auth />
           </Route>
           {/* If the there is no matching path then re-direct back to / */}
           <Redirect to="/" />
