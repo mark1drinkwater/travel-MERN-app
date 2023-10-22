@@ -1,4 +1,6 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
+
+import { validate } from '../../util/Validators'
 import './Input.css';
 
 const inputReducer = (state, action) => {
@@ -9,8 +11,13 @@ const inputReducer = (state, action) => {
                 ...state,
                 // Then we can add or overwrite properties of the previous state
                 value: action.val,
-                isValid: true
+                isValid: validate(action.val, action.validators)
             };
+            case 'TOUCH':
+                return {
+                    ...state,
+                    isTouched: true
+                }
         default:
             // If we have some action which we don't explictily handle
             // Then we return the state unchanged
@@ -23,12 +30,32 @@ const Input = props => {
     // A reducer is just a function which receives an action which we can dispatch
     // and receives the current state, and update the current state based on the action we received
     // and return the new state and give it back to us in the component and re-render everything
-    const [inputState, dispatch] = useReducer(inputReducer, {value: '', isValid: false});
+    const [inputState, dispatch] = useReducer(inputReducer, {
+        value: props.value || '', 
+        isTouched: false,
+        isValid: props.valid || false
+    });
+
+    const {id, onInput } = props;
+    const { value, isValid } = inputState;
+
+    useEffect(() => {
+        onInput(id, value, isValid)
+    }, [id, value, isValid, onInput]);
 
     const changeHandler = event => {
-        dispatch({type: 'CHANGE', val: event.target.value});
+        dispatch({
+            type: 'CHANGE', 
+            val: event.target.value,
+            validators: props.validators
+        });
     };
 
+    const touchHandler = () => {
+        dispatch({
+            type: 'TOUCH'
+        })
+    };
 
     // If input is specified use input else use textarea.
     const element = 
@@ -38,6 +65,7 @@ const Input = props => {
             type={props.type} 
             placeholder={props.placeholder} 
             onChange={changeHandler}
+            onBlur={touchHandler}
             value={inputState.value}
         /> 
     ) : (
@@ -45,6 +73,7 @@ const Input = props => {
             id={props.id} 
             rows={props.rows || 3} 
             onChange={changeHandler} 
+            onBlur={touchHandler}
             // This sets the content of the textarea
             value={inputState.value} 
         />
@@ -53,11 +82,11 @@ const Input = props => {
 
     return (
         // Show error message if inputState is valid
-        <div className={`form-control ${!inputState.isValid 
+        <div className={`form-control ${!inputState.isValid && inputState.isTouched
             && 'form-control--invalid'}`}>
             <label htmlFor={props.id}>{props.label}</label>
             {element}
-            {!inputState.isValid && <p>{props.errorText}</p>}
+            {!inputState.isValid && inputState.isTouched && <p>{props.errorText}</p>}
         </div>
     )
 };
