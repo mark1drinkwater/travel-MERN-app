@@ -1,6 +1,9 @@
 const express = require('express');
+const { check } = require('express-validator');
 
 const router = express.Router();
+
+const usersControllers = require('../controllers/users-controller');
 
 const DUMMY_PLACES = [
     {
@@ -25,10 +28,28 @@ const DUMMY_PLACES = [
             lat: 40.7484405,
             long: -73.9882393
         },
-        creator: 'u2'
+        creator: 'u1'
     }
 ];
 
+router.get('/', usersControllers.getUsers);
 
+router.post(
+    '/signup', 
+    [
+        check('name')
+            .not()
+            .isEmpty(),
+        check('email')
+            .normalizeEmail()
+            .isEmail(),
+        check('password')
+            .not()
+            .isEmpty()
+            .isLength({ min: 8 })
+    ],
+    usersControllers.signup);
+
+router.post('/login', usersControllers.login);
 
 module.exports = router;
