@@ -5,32 +5,32 @@ const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
 const Place = require('../models/place');
 
-const DUMMY_PLACES = [
-    {
-        id: 'p1',
-        title: 'Empire State Building',
-        description: 'One of the most famous sky scrapers in the world!',
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Empire_State_Building_%28aerial_view%29.jpg',
-        address: '20 W 34th St., New York, NY 10001',
-        location: {
-            lat: 40.7484405,
-            long: -73.9878584
-        },
-        creator: 'u1'
-    },
-    {
-        id: 'p2',
-        title: 'Emp. State Building',
-        description: 'One of the most famous sky scrapers in the world!',
-        imageUrl: 'https://media.timeout.com/images/101705309/750/422/image.jpg',
-        address: '20 W 34th St., New York, NY 10001',
-        location: {
-            lat: 40.7484405,
-            long: -73.9882393
-        },
-        creator: 'u1'
-    }
-];
+// const DUMMY_PLACES = [
+//     {
+//         id: 'p1',
+//         title: 'Empire State Building',
+//         description: 'One of the most famous sky scrapers in the world!',
+//         imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/10/Empire_State_Building_%28aerial_view%29.jpg',
+//         address: '20 W 34th St., New York, NY 10001',
+//         location: {
+//             lat: 40.7484405,
+//             long: -73.9878584
+//         },
+//         creator: 'u1'
+//     },
+//     {
+//         id: 'p2',
+//         title: 'Emp. State Building',
+//         description: 'One of the most famous sky scrapers in the world!',
+//         imageUrl: 'https://media.timeout.com/images/101705309/750/422/image.jpg',
+//         address: '20 W 34th St., New York, NY 10001',
+//         location: {
+//             lat: 40.7484405,
+//             long: -73.9882393
+//         },
+//         creator: 'u1'
+//     }
+// ];
 
 const getPlaceById = async (req, res, next) => {
     const placeId = req.params.pid;
@@ -47,7 +47,7 @@ const getPlaceById = async (req, res, next) => {
     // This error is displayed if a place by that id does not exist.
     if (!place) {
         const error = new Error('Could not find a place for the provided id.', 404);
-        throw next(error);
+        return next(error);
     } 
 
     // Convert model to normal JS object & add a id property without the _id
@@ -73,8 +73,7 @@ const getPlacesByUserId = async (req, res, next) => {
     } 
 
 
-    // If the code is synchronous you can either use next or throw an error.
-    // If the code is asyonchronous (like waiting for a database) then you must use next.
+    // The code is asyonchronous (like waiting for a database) then you must use next.
     if (!places || places.length === 0) {
         return next(
             new HttpError('Could not find places for the provided user.', 404)
@@ -121,17 +120,15 @@ const createPlace = async (req, res, next) => {
         return next(error);
     }
 
-     DUMMY_PLACES.push(createdPlace); // or unshift
-
      // 201 -- The creation of new data was a success
-     res.status(201).json(createdPlace);
+     res.status(201).json({createdPlace: createdPlace.toObject({ getters: true }) });
 };
 
 const updatePlace = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         console.log(errors);
-        throw new HttpError('Invalid inputs passed, please check your data.', 422);
+        return next(new HttpError('Invalid inputs passed, please check your data.', 422));
     }
 
     const { title, description } = req.body;
